@@ -1,6 +1,9 @@
 fasttemplate
 ============
 
+[![GoDoc](https://godoc.org/github.com/tmthrgd/fasttemplate?status.svg)](https://godoc.org/github.com/tmthrgd/fasttemplate)
+[![Build Status](https://travis-ci.org/tmthrgd/fasttemplate.svg?branch=master)](https://travis-ci.org/tmthrgd/fasttemplate)
+
 Simple and fast template engine for Go.
 
 Fasttemplate peforms only a single task - it substitutes template placeholders
