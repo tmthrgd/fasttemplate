@@ -61,12 +61,8 @@ func NewTemplate(template, startTag, endTag string) (*Template, error) {
 		return &t, nil
 	}
 
-	if tagsCount+1 > cap(t.texts) {
-		t.texts = make([][]byte, 0, tagsCount+1)
-	}
-	if tagsCount > cap(t.tags) {
-		t.tags = make([]string, 0, tagsCount)
-	}
+	t.texts = make([][]byte, 0, tagsCount+1)
+	t.tags = make([]string, 0, tagsCount)
 
 	for {
 		n := strings.Index(st, startTag)
