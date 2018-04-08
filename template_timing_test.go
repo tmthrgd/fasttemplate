@@ -230,27 +230,6 @@ func BenchmarkNewTemplate(b *testing.B) {
 	})
 }
 
-func BenchmarkTemplateReset(b *testing.B) {
-	b.RunParallel(func(pb *testing.PB) {
-		t := New(source, "{{", "}}")
-		for pb.Next() {
-			t.Reset(source, "{{", "}}")
-		}
-	})
-}
-
-func BenchmarkTemplateResetExecuteFunc(b *testing.B) {
-	b.RunParallel(func(pb *testing.PB) {
-		t := New(source, "{{", "}}")
-		var w bytes.Buffer
-		for pb.Next() {
-			t.Reset(source, "{{", "}}")
-			t.ExecuteFunc(&w, testTagFunc)
-			w.Reset()
-		}
-	})
-}
-
 func testTagFunc(w io.Writer, tag string) (int, error) {
 	return w.Write(m[tag].([]byte))
 }

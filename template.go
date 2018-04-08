@@ -43,32 +43,6 @@ func New(template, startTag, endTag string) *Template {
 // The returned template can be executed by concurrently running goroutines
 // using Execute* methods.
 func NewTemplate(template, startTag, endTag string) (*Template, error) {
-	var t Template
-	err := t.Reset(template, startTag, endTag)
-	if err != nil {
-		return nil, err
-	}
-	return &t, nil
-}
-
-// TagFunc can be used as a substitution value in the map passed to Execute*.
-// Execute* functions pass tag (placeholder) name in 'tag' argument.
-//
-// TagFunc must be safe to call from concurrently running goroutines.
-//
-// TagFunc must write contents to w and return the number of bytes written.
-type TagFunc func(w io.Writer, tag string) (int, error)
-
-// Reset resets the template t to new one defined by
-// template, startTag and endTag.
-//
-// Reset allows Template object re-use.
-//
-// Reset may be called only if no other goroutines call t methods at the moment.
-func (t *Template) Reset(template, startTag, endTag string) error {
-	t.texts = t.texts[:0]
-	t.tags = t.tags[:0]
-
 	if len(startTag) == 0 {
 		panic("startTag cannot be empty")
 	}
@@ -79,11 +53,12 @@ func (t *Template) Reset(template, startTag, endTag string) error {
 	s := []byte(template)
 	st := template
 
-	t.template = s
+	var t Template
 
 	tagsCount := strings.Count(template, startTag)
 	if tagsCount == 0 {
-		return nil
+		t.template = s
+		return &t, nil
 	}
 
 	if tagsCount+1 > cap(t.texts) {
@@ -106,7 +81,7 @@ func (t *Template) Reset(template, startTag, endTag string) error {
 
 		n = strings.Index(st, endTag)
 		if n < 0 {
-			return fmt.Errorf("Cannot find end tag=%q in the template=%q starting from %q", endTag, template, s)
+			return nil, fmt.Errorf("Cannot find end tag=%q in the template=%q starting from %q", endTag, template, s)
 		}
 
 		t.tags = append(t.tags, st[:n])
@@ -115,8 +90,16 @@ func (t *Template) Reset(template, startTag, endTag string) error {
 		st = st[n+len(endTag):]
 	}
 
-	return nil
+	return &t, nil
 }
+
+// TagFunc can be used as a substitution value in the map passed to Execute*.
+// Execute* functions pass tag (placeholder) name in 'tag' argument.
+//
+// TagFunc must be safe to call from concurrently running goroutines.
+//
+// TagFunc must write contents to w and return the number of bytes written.
+type TagFunc func(w io.Writer, tag string) (int, error)
 
 // ExecuteFunc calls f on each template tag (placeholder) occurrence.
 //
