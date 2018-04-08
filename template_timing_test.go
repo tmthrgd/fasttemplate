@@ -13,7 +13,7 @@ import (
 var (
 	source        = "https://{{uid}}.foo.bar.com/?cb={{cb}}{{width}}&width={{width}}&height={{height}}&timeout={{timeout}}&uid={{uid}}&subid={{subid}}&ref={{ref}}"
 	result        = "https://aaasdf.foo.bar.com/?cb=12341232&width=1232&height=123&timeout=123123&uid=aaasdf&subid=asdfds&ref=https://google.com/aaa/bbb/ccc"
-	resultEscaped = "https://aaasdf.foo.bar.com/?cb=12341232&width=1232&height=123&timeout=123123&uid=aaasdf&subid=asdfds&ref=http%3A%2F%2Fgoogle.com%2Faaa%2Fbbb%2Fccc"
+	resultEscaped = "https://aaasdf.foo.bar.com/?cb=12341232&width=1232&height=123&timeout=123123&uid=aaasdf&subid=asdfds&ref=https%3A%2F%2Fgoogle.com%2Faaa%2Fbbb%2Fccc"
 
 	resultBytes        = []byte(result)
 	resultEscapedBytes = []byte(resultEscaped)
