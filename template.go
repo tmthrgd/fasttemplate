@@ -218,7 +218,7 @@ func stdTagFunc(w io.Writer, tag string, m map[string]interface{}) (int, error) 
 	case []byte:
 		return w.Write(value)
 	case string:
-		return w.Write([]byte(value))
+		return io.WriteString(w, value)
 	case TagFunc:
 		return value(w, tag)
 	default:
