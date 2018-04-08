@@ -11,9 +11,9 @@ import (
 )
 
 var (
-	source        = "http://{{uid}}.foo.bar.com/?cb={{cb}}{{width}}&width={{width}}&height={{height}}&timeout={{timeout}}&uid={{uid}}&subid={{subid}}&ref={{ref}}"
-	result        = "http://aaasdf.foo.bar.com/?cb=12341232&width=1232&height=123&timeout=123123&uid=aaasdf&subid=asdfds&ref=http://google.com/aaa/bbb/ccc"
-	resultEscaped = "http://aaasdf.foo.bar.com/?cb=12341232&width=1232&height=123&timeout=123123&uid=aaasdf&subid=asdfds&ref=http%3A%2F%2Fgoogle.com%2Faaa%2Fbbb%2Fccc"
+	source        = "https://{{uid}}.foo.bar.com/?cb={{cb}}{{width}}&width={{width}}&height={{height}}&timeout={{timeout}}&uid={{uid}}&subid={{subid}}&ref={{ref}}"
+	result        = "https://aaasdf.foo.bar.com/?cb=12341232&width=1232&height=123&timeout=123123&uid=aaasdf&subid=asdfds&ref=https://google.com/aaa/bbb/ccc"
+	resultEscaped = "https://aaasdf.foo.bar.com/?cb=12341232&width=1232&height=123&timeout=123123&uid=aaasdf&subid=asdfds&ref=http%3A%2F%2Fgoogle.com%2Faaa%2Fbbb%2Fccc"
 
 	resultBytes        = []byte(result)
 	resultEscapedBytes = []byte(resultEscaped)
@@ -25,7 +25,7 @@ var (
 		"timeout": []byte("123123"),
 		"uid":     []byte("aaasdf"),
 		"subid":   []byte("asdfds"),
-		"ref":     []byte("http://google.com/aaa/bbb/ccc"),
+		"ref":     []byte("https://google.com/aaa/bbb/ccc"),
 	}
 )
 
@@ -42,7 +42,7 @@ func BenchmarkFmtFprintf(b *testing.B) {
 		var w bytes.Buffer
 		for pb.Next() {
 			fmt.Fprintf(&w,
-				"http://%[5]s.foo.bar.com/?cb=%[1]s%[2]s&width=%[2]s&height=%[3]s&timeout=%[4]s&uid=%[5]s&subid=%[6]s&ref=%[7]s",
+				"https://%[5]s.foo.bar.com/?cb=%[1]s%[2]s&width=%[2]s&height=%[3]s&timeout=%[4]s&uid=%[5]s&subid=%[6]s&ref=%[7]s",
 				m["cb"], m["width"], m["height"], m["timeout"], m["uid"], m["subid"], m["ref"])
 			x := w.Bytes()
 			if !bytes.Equal(x, resultBytes) {
