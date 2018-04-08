@@ -7,6 +7,7 @@
 package fasttemplate
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"strings"
@@ -158,6 +159,30 @@ func (t *Template) ExecuteFunc(w io.Writer, f TagFunc) (int64, error) {
 // Returns the number of bytes written to w.
 func (t *Template) Execute(w io.Writer, m map[string]interface{}) (int64, error) {
 	return t.ExecuteFunc(w, func(w io.Writer, tag string) (int, error) { return stdTagFunc(w, tag, m) })
+}
+
+// ExecuteFuncBytes calls f on each template tag (placeholder) occurrence
+// and substitutes it with the data written to TagFunc's w.
+//
+// Returns the resulting byte slice.
+func (t *Template) ExecuteFuncBytes(f TagFunc) []byte {
+	var buf bytes.Buffer
+	buf.Grow(len(t.template))
+	if _, err := t.ExecuteFunc(&buf, f); err != nil {
+		panic(fmt.Sprintf("unexpected error: %s", err))
+	}
+	return buf.Bytes()
+}
+
+// ExecuteBytes substitutes template tags (placeholders) with the corresponding
+// values from the map m and returns the result.
+//
+// Substitution map m may contain values with the following types:
+//   * []byte - the fastest value type
+//   * string - convenient value type
+//   * TagFunc - flexible value type
+func (t *Template) ExecuteBytes(m map[string]interface{}) []byte {
+	return t.ExecuteFuncBytes(func(w io.Writer, tag string) (int, error) { return stdTagFunc(w, tag, m) })
 }
 
 // ExecuteFuncString calls f on each template tag (placeholder) occurrence
