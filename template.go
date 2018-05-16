@@ -44,10 +44,10 @@ func New(template, startTag, endTag string) *Template {
 // using Execute* methods.
 func NewTemplate(template, startTag, endTag string) (*Template, error) {
 	if len(startTag) == 0 {
-		panic("startTag cannot be empty")
+		panic("fasttemplate: startTag cannot be empty")
 	}
 	if len(endTag) == 0 {
-		panic("endTag cannot be empty")
+		panic("fasttemplate: endTag cannot be empty")
 	}
 
 	s := []byte(template)
@@ -77,7 +77,7 @@ func NewTemplate(template, startTag, endTag string) (*Template, error) {
 
 		n = strings.Index(st, endTag)
 		if n < 0 {
-			return nil, fmt.Errorf("Cannot find end tag=%q in the template=%q starting from %q", endTag, template, s)
+			return nil, fmt.Errorf("fasttemplate: missing end tag=%q in template=%q starting from %q", endTag, template, s)
 		}
 
 		t.tags = append(t.tags, st[:n])
@@ -122,6 +122,7 @@ func (t *Template) ExecuteFunc(w io.Writer, f TagFunc) (int64, error) {
 			return nn, err
 		}
 	}
+
 	ni, err := w.Write(t.texts[n])
 	nn += int64(ni)
 	return nn, err
@@ -148,7 +149,7 @@ func (t *Template) ExecuteFuncBytes(f TagFunc) []byte {
 	var buf bytes.Buffer
 	buf.Grow(len(t.template))
 	if _, err := t.ExecuteFunc(&buf, f); err != nil {
-		panic(fmt.Sprintf("unexpected error: %s", err))
+		panic(fmt.Sprintf("fasttemplate: unexpected error: %s", err))
 	}
 	return buf.Bytes()
 }
@@ -172,7 +173,7 @@ func (t *Template) ExecuteFuncString(f TagFunc) string {
 	var sb strings.Builder
 	sb.Grow(len(t.template))
 	if _, err := t.ExecuteFunc(&sb, f); err != nil {
-		panic(fmt.Sprintf("unexpected error: %s", err))
+		panic(fmt.Sprintf("fasttemplate: unexpected error: %s", err))
 	}
 	return sb.String()
 }
@@ -201,6 +202,6 @@ func stdTagFunc(w io.Writer, tag string, m map[string]interface{}) (int, error) 
 	case TagFunc:
 		return value(w, tag)
 	default:
-		panic(fmt.Sprintf("tag=%q contains unexpected value type=%#v. Expected []byte, string or TagFunc", tag, v))
+		panic(fmt.Sprintf("fasttemplate: tag=%q contains unexpected value type=%#v", tag, v))
 	}
 }
