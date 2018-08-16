@@ -123,7 +123,7 @@ func BenchmarkFastTemplateExecuteFunc(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		var w bytes.Buffer
 		for pb.Next() {
-			if _, err := t.ExecuteFunc(&w, testTagFunc); err != nil {
+			if err := t.ExecuteFunc(&w, testTagFunc); err != nil {
 				b.Fatalf("unexpected error: %s", err)
 			}
 			x := w.Bytes()
@@ -145,7 +145,7 @@ func BenchmarkFastTemplateExecute(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		var w bytes.Buffer
 		for pb.Next() {
-			if _, err := t.Execute(&w, m); err != nil {
+			if err := t.Execute(&w, m); err != nil {
 				b.Fatalf("unexpected error: %s", err)
 			}
 			x := w.Bytes()
@@ -201,7 +201,10 @@ func BenchmarkFastTemplateExecuteTagFunc(b *testing.B) {
 	for k, v := range m {
 		if k == "ref" {
 			vv := v.([]byte)
-			v = TagFunc(func(w io.Writer, tag string) (int, error) { return w.Write([]byte(url.QueryEscape(string(vv)))) })
+			v = TagFunc(func(w io.Writer, tag string) error {
+				_, err := io.WriteString(w, url.QueryEscape(string(vv)))
+				return err
+			})
 		}
 		mm[k] = v
 	}
@@ -210,7 +213,7 @@ func BenchmarkFastTemplateExecuteTagFunc(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		var w bytes.Buffer
 		for pb.Next() {
-			if _, err := t.Execute(&w, mm); err != nil {
+			if err := t.Execute(&w, mm); err != nil {
 				b.Fatalf("unexpected error: %s", err)
 			}
 			x := w.Bytes()
@@ -230,6 +233,7 @@ func BenchmarkNewTemplate(b *testing.B) {
 	})
 }
 
-func testTagFunc(w io.Writer, tag string) (int, error) {
-	return w.Write(m[tag].([]byte))
+func testTagFunc(w io.Writer, tag string) error {
+	_, err := w.Write(m[tag].([]byte))
+	return err
 }

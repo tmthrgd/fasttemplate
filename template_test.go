@@ -179,7 +179,10 @@ func TestMixedValues(t *testing.T) {
 	s := tpl.ExecuteString(map[string]interface{}{
 		"foo": "111",
 		"bar": []byte("bbb"),
-		"baz": TagFunc(func(w io.Writer, tag string) (int, error) { return w.Write([]byte(tag)) }),
+		"baz": TagFunc(func(w io.Writer, tag string) error {
+			_, err := io.WriteString(w, tag)
+			return err
+		}),
 	})
 	result := "foo111barbbbbazbaz"
 	if s != result {

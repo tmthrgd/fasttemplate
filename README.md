@@ -71,14 +71,17 @@ Advanced usage
 	if err != nil {
 		log.Fatalf("unexpected error when parsing template: %s", err)
 	}
-	s := t.ExecuteFuncString(func(w io.Writer, tag string) (int, error) {
+	s := t.ExecuteFuncString(func(w io.Writer, tag string) error {
 		switch tag {
 		case "user":
-			return w.Write([]byte("John"))
+			_, err := io.WriteString(w, "John")
+			return err
 		case "prize":
-			return w.Write([]byte("$100500"))
+			_, err := io.WriteString(w, "$100500")
+			return err
 		default:
-			return w.Write([]byte(fmt.Sprintf("[unknown tag %q]", tag)))
+			_, err := fmt.Fprintf(w, "[unknown tag %q]", tag)
+			return err
 		}
 	})
 	fmt.Printf("%s", s)
